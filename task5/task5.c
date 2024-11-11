@@ -1,16 +1,12 @@
-//
-//  task5.c
-//
-//
-//  Created by Angelos Stavrou
-//
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <time.h>
 
 int main() {
-    // for (int n = 256; n <= 8192; n *= 2) {  // Start at 256 bytes and double each iteration
-    for (int n = 256; n <= 1024; n *= 2) {  // Start at 256 bytes, double the size twice, then stop
+    int n = 256;  // Start at 256 bytes
+
+    while (1) {  // Infinite loop to test until system performance is affected
         int LEN = n;
 
         unsigned char *key = (unsigned char *) malloc(sizeof(unsigned char) * LEN);
@@ -26,21 +22,19 @@ int main() {
             return 1;
         }
 
+        // Measure time taken for key generation
+        clock_t start_time = clock();
         fread(key, sizeof(unsigned char) * LEN, 1, random);
+        clock_t end_time = clock();
         fclose(random);
+        double time_taken = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
 
-        // Print the generated key in hexadecimal format
-        printf("Generated key of size %d bytes (%d bits):\n", LEN, LEN * 8);
-        for (int i = 0; i < LEN; i++) {
-            printf("%02x", key[i]);
-            if (i % 16 == 15) {
-                printf("\n"); // Print a newline every 16 bytes for readability
-            }
-        }
-        printf("\n\n");
+        // Print the generated key size and time taken
+        printf("Generated key of size %d bytes (%lld bits) in %.6f seconds:\n", LEN, (long long)LEN*8, time_taken);
 
         free(key);
-    }
 
+        n = pow(2, log2(n) + 1);  // Update n to 2^n
+    }
     return 0;
 }
